@@ -142,7 +142,7 @@ void gpsSetState(gpsState_e state)
 
 static void gpsUpdateTime(void)
 {
-    if (!rtcHasTime() && gpsSol.flags.validTime) {
+    if (!rtcHasTime() && gpsSol.flags.validTime && gpsSol.time.year != 0) {
         rtcSetDateTime(&gpsSol.time);
     }
 }
