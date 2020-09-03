@@ -84,11 +84,20 @@ void gpsHandleMSP(void)
     }
 }
 
+static uint8_t gpsMapFixType(uint8_t mspFixType)
+{
+    if (mspFixType == 2)
+        return GPS_FIX_2D;
+    if (mspFixType >= 3)
+        return GPS_FIX_3D;
+    return GPS_NO_FIX;
+}
+
 void mspGPSReceiveNewData(uint8_t * bufferPtr)
 {
     mspGpsDataMessage_t * pkt = (mspGpsDataMessage_t *)bufferPtr;
 
-    gpsSol.fixType   = (pkt->fixType >= 3);
+    gpsSol.fixType   = gpsMapFixType(pkt->fixType);
     gpsSol.numSat    = pkt->satellitesInView;
     gpsSol.llh.lon   = pkt->longitude;
     gpsSol.llh.lat   = pkt->latitude;
