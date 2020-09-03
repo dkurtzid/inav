@@ -58,11 +58,10 @@ typedef struct __attribute__((packed)) {
     int32_t  latitude;
     int32_t  mslAltitude;       // cm
     int32_t  nedVelNorth;       // cm/s
-    int32_t  nedVelNorthEast;
-    int32_t  nedVelNorthDown;
-    int32_t  groundSpeed;
+    int32_t  nedVelEast;
+    int32_t  nedVelDown;
     int16_t  groundCourse;      // deg * 100
-    int16_t  trueYaw;
+    int16_t  trueYaw;           // deg * 100, values of 0..36000 are valid. 65535 = no data available
     uint16_t year;
     uint8_t  month;
     uint8_t  day;
@@ -95,9 +94,9 @@ void mspGPSReceiveNewData(uint8_t * bufferPtr)
     gpsSol.llh.lat   = pkt->latitude;
     gpsSol.llh.alt   = pkt->mslAltitude;
     gpsSol.velNED[X] = pkt->nedVelNorth;
-    gpsSol.velNED[Y] = pkt->nedVelNorthEast;
-    gpsSol.velNED[Z] = pkt->nedVelNorthDown;
-    gpsSol.groundSpeed = pkt->groundSpeed;
+    gpsSol.velNED[Y] = pkt->nedVelEast;
+    gpsSol.velNED[Z] = pkt->nedVelDown;
+    gpsSol.groundSpeed = sqrtf(sq((float)pkt->nedVelNorth) + sq((float)pkt->nedVelEast));
     gpsSol.groundCourse = pkt->groundCourse / 10;   // in deg * 10
     gpsSol.eph = gpsConstrainEPE(pkt->horizontalPosAccuracy / 10);
     gpsSol.epv = gpsConstrainEPE(pkt->verticalPosAccuracy / 10);
@@ -118,5 +117,4 @@ void mspGPSReceiveNewData(uint8_t * bufferPtr)
 
     newDataReady = true;
 }
-
 #endif
